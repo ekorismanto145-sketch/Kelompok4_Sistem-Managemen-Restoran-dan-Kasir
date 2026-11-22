@@ -12,7 +12,7 @@
                 <a href="{{ route('profile.edit') }}" class="block rounded-xl px-3.5 py-2.5 text-slate-300 hover:bg-white/5">Profil</a>
                 <form method="POST" action="{{ route('logout') }}" class="pt-4">
                     @csrf
-                    <button type="submit" class="w-full rounded-xl bg-red-600 px-3.5 py-2.5 text-left font-semibold text-white hover:bg-red-700">Keluar</button>
+                    <button type="submit" style="background-color: #dc2626; color: #ffffff;" class="w-full rounded-xl px-3.5 py-2.5 text-left font-semibold hover:opacity-90">Keluar</button>
                 </form>
             </nav>
         </aside>
@@ -32,47 +32,53 @@
                 <a href="{{ route('manajer.reports') }}" class="block py-2 text-slate-300">Laporan</a>
             </nav>
 
-            <main class="mx-auto max-w-5xl p-4 md:p-8">
+            <main class="mx-auto max-w-6xl p-4 md:p-8">
                 <div class="flex flex-wrap items-center justify-between gap-2">
-                    <h1 class="text-xl font-extrabold">Ringkasan Hari Ini</h1>
-                    <span class="rounded-xl border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-slate-600">
+                    <h1 class="text-xl font-extrabold text-[#1E2A47]">Ringkasan hari ini</h1>
+                    <span class="rounded-xl border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-slate-600 shadow-sm">
                         {{ now()->translatedFormat('d M Y') }}
                     </span>
                 </div>
 
                 <div class="mt-5 grid grid-cols-1 gap-4 md:grid-cols-3">
-                    <div class="rounded-2xl border border-orange-100 bg-orange-50/70 p-5">
+                    <div style="background-color: #fff5f2;" class="rounded-2xl border border-orange-100 p-5">
                         <p class="text-xs font-semibold text-slate-500">Omzet</p>
                         <p class="mt-1.5 text-2xl font-extrabold text-[#1E2A47]"><x-price :amount="$omzetToday" /></p>
                     </div>
-                    <div class="rounded-2xl border border-blue-100 bg-blue-50/70 p-5">
+                    <div style="background-color: #f0f7ff;" class="rounded-2xl border border-blue-100 p-5">
                         <p class="text-xs font-semibold text-slate-500">Pesanan</p>
                         <p class="mt-1.5 text-2xl font-extrabold text-[#1E2A47]">{{ $ordersToday }}</p>
                     </div>
-                    <div class="rounded-2xl border border-teal-100 bg-teal-50/70 p-5">
+                    <div style="background-color: #f0fdf9;" class="rounded-2xl border border-teal-100 p-5">
                         <p class="text-xs font-semibold text-slate-500">Rata-rata / pesanan</p>
                         <p class="mt-1.5 text-2xl font-extrabold text-[#1E2A47]"><x-price :amount="$avgOrder" /></p>
                     </div>
                 </div>
 
-                <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-12">
-                    <div class="min-w-0 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:col-span-7">
-                        <h2 class="font-bold">Pesanan per jam</h2>
+                <style>
+                    .mgr-bottom-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+                    @media (min-width: 1024px) {
+                        .mgr-bottom-grid { grid-template-columns: 7fr 5fr; }
+                    }
+                </style>
+                <div class="mgr-bottom-grid mt-6">
+                    <div class="min-w-0 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                        <h2 class="text-sm font-bold text-[#1E2A47]">Pesanan per jam</h2>
                         @php $maxHourly = max(1, $hourlyOrders->max()); @endphp
-                        <div class="mt-4 flex h-44 items-end gap-1.5 overflow-x-auto pt-4">
+                        <div class="mt-4 flex h-44 items-end gap-2 pt-4">
                             @foreach ($hourlyOrders as $hour => $count)
-                                <div class="flex min-w-[20px] flex-1 flex-col items-center gap-1">
+                                <div class="flex flex-1 flex-col items-center gap-1">
                                     <span class="text-[10px] font-semibold text-slate-500">{{ $count }}</span>
                                     <div class="w-full rounded-t-md {{ $count === $maxHourly && $count > 0 ? 'bg-[#E4572E]' : 'bg-[#3D7DD8]' }}"
-                                         style="height: {{ max(8, (int) round(($count / $maxHourly) * 110)) }}px"></div>
+                                         style="height: {{ max(10, (int) round(($count / $maxHourly) * 110)) }}px"></div>
                                     <span class="text-[10px] text-slate-400">{{ $hour }}</span>
                                 </div>
                             @endforeach
                         </div>
                     </div>
 
-                    <div class="min-w-0 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:col-span-5">
-                        <h2 class="font-bold">Menu terlaris</h2>
+                    <div class="min-w-0 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                        <h2 class="text-sm font-bold text-[#1E2A47]">Menu terlaris</h2>
                         <ul class="mt-4 space-y-2.5 text-sm">
                             @forelse ($topMenus as $idx => $item)
                                 <li class="flex items-center justify-between border-b border-slate-100 pb-2">

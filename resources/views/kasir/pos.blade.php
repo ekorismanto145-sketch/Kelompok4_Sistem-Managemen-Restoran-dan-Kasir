@@ -67,7 +67,7 @@
                             <div>
                                 <div class="relative mb-2.5 aspect-square overflow-hidden rounded-xl bg-slate-100">
                                     @if ($menu->image_url)
-                                        <img src="{{ $menu->image_url }}" alt="{{ $menu->name }}" class="h-full w-full object-cover">
+                                        <img src="{{ $menu->image_url }}" alt="{{ $menu->name }}" referrerpolicy="no-referrer" class="h-full w-full object-cover">
                                     @else
                                         <div class="flex h-full items-center justify-center text-xs font-medium text-slate-400">
                                             {{ $menu->category->name }}

@@ -13,6 +13,14 @@ class ReportController extends Controller
 {
     public function index(Request $request): View
     {
+        $request->validate([
+            'start_date' => ['nullable', 'date', 'before_or_equal:today'],
+            'end_date' => ['nullable', 'date', 'before_or_equal:today'],
+        ], [
+            'start_date.before_or_equal' => 'Tanggal mulai tidak boleh lebih dari hari ini.',
+            'end_date.before_or_equal' => 'Tanggal akhir tidak boleh lebih dari hari ini.',
+        ]);
+
         $startDate = $request->date('start_date') ?? now()->startOfMonth();
         $endDate = $request->date('end_date') ?? now()->endOfDay();
 

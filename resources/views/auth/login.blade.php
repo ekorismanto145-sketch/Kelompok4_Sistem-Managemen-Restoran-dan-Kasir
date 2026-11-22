@@ -44,6 +44,9 @@
             </form>
 
             <p class="mt-4 text-center text-xs text-slate-500">
+                <a href="{{ route('password.request') }}" class="font-semibold text-[#E4572E]">Lupa password?</a>
+            </p>
+            <p class="mt-2 text-center text-xs text-slate-500">
                 Belum punya akun? <a href="{{ route('register') }}" class="font-semibold text-[#E4572E]">Daftar</a>
             </p>
         </div>

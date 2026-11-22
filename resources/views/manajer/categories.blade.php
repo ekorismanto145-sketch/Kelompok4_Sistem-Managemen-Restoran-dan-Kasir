@@ -8,6 +8,10 @@
                 <a href="{{ route('manajer.categories.index') }}" class="block rounded-xl bg-white/10 px-3.5 py-2.5 font-semibold">Kategori</a>
                 <a href="{{ route('manajer.kasir.index') }}" class="block rounded-xl px-3.5 py-2.5 text-slate-300 hover:bg-white/5">Akun Kasir</a>
                 <a href="{{ route('manajer.reports') }}" class="block rounded-xl px-3.5 py-2.5 text-slate-300 hover:bg-white/5">Laporan</a>
+                <form method="POST" action="{{ route('logout') }}" class="pt-4">
+                    @csrf
+                    <button type="submit" style="background-color: #dc2626; color: #ffffff;" class="w-full rounded-xl px-3.5 py-2.5 text-left font-semibold hover:opacity-90">Keluar</button>
+                </form>
             </nav>
         </aside>
 

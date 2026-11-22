@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Menu;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class MenuController extends Controller
@@ -26,10 +27,16 @@ class MenuController extends Controller
             'name' => ['required', 'string', 'max:150'],
             'description' => ['nullable', 'string', 'max:500'],
             'price' => ['required', 'integer', 'min:0'],
-            'image_url' => ['nullable', 'url', 'max:500'],
+            'image' => ['nullable', 'image', 'max:2048'],
             'is_available' => ['boolean'],
             'has_spicy_level' => ['boolean'],
         ]);
+
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('menus', 'public');
+            $data['image_url'] = asset('storage/'.$path);
+        }
+        unset($data['image']);
 
         $data['is_available'] = $request->boolean('is_available', true);
         $data['has_spicy_level'] = $request->boolean('has_spicy_level');
@@ -46,10 +53,16 @@ class MenuController extends Controller
             'name' => ['required', 'string', 'max:150'],
             'description' => ['nullable', 'string', 'max:500'],
             'price' => ['required', 'integer', 'min:0'],
-            'image_url' => ['nullable', 'url', 'max:500'],
+            'image' => ['nullable', 'image', 'max:2048'],
             'is_available' => ['boolean'],
             'has_spicy_level' => ['boolean'],
         ]);
+
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('menus', 'public');
+            $data['image_url'] = asset('storage/'.$path);
+        }
+        unset($data['image']);
 
         $data['is_available'] = $request->boolean('is_available');
         $data['has_spicy_level'] = $request->boolean('has_spicy_level');

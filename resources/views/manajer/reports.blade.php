@@ -8,6 +8,10 @@
                 <a href="{{ route('manajer.categories.index') }}" class="block rounded-xl px-3.5 py-2.5 text-slate-300 hover:bg-white/5">Kategori</a>
                 <a href="{{ route('manajer.kasir.index') }}" class="block rounded-xl px-3.5 py-2.5 text-slate-300 hover:bg-white/5">Akun Kasir</a>
                 <a href="{{ route('manajer.reports') }}" class="block rounded-xl bg-white/10 px-3.5 py-2.5 font-semibold">Laporan</a>
+                <form method="POST" action="{{ route('logout') }}" class="pt-4">
+                    @csrf
+                    <button type="submit" style="background-color: #dc2626; color: #ffffff;" class="w-full rounded-xl px-3.5 py-2.5 text-left font-semibold hover:opacity-90">Keluar</button>
+                </form>
             </nav>
         </aside>
 
@@ -18,11 +22,11 @@
                 <form method="GET" class="mt-4 flex flex-wrap items-end gap-3 rounded-2xl border border-slate-200 bg-white p-4">
                     <div>
                         <label class="block text-xs font-semibold text-slate-500">Dari</label>
-                        <input type="date" name="start_date" value="{{ $startDate->format('Y-m-d') }}" class="mt-1 rounded-xl border border-slate-200 px-3 py-2 text-sm">
+                        <input type="date" name="start_date" value="{{ $startDate->format('Y-m-d') }}" max="{{ today()->format('Y-m-d') }}" class="mt-1 rounded-xl border border-slate-200 px-3 py-2 text-sm">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-500">Sampai</label>
-                        <input type="date" name="end_date" value="{{ $endDate->format('Y-m-d') }}" class="mt-1 rounded-xl border border-slate-200 px-3 py-2 text-sm">
+                        <input type="date" name="end_date" value="{{ $endDate->format('Y-m-d') }}" max="{{ today()->format('Y-m-d') }}" class="mt-1 rounded-xl border border-slate-200 px-3 py-2 text-sm">
                     </div>
                     <button type="submit" class="rounded-xl bg-[#E4572E] px-5 py-2.5 text-sm font-bold text-white">Filter</button>
                 </form>

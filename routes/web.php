@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Customer\CheckoutController;
 use App\Http\Controllers\Customer\MenuController;
 use App\Http\Controllers\Customer\MockPaymentController;
@@ -24,6 +25,12 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
+    Route::get('/forgot-password', [PasswordResetController::class, 'showForgot'])->name('password.request');
+    Route::post('/forgot-password', [PasswordResetController::class, 'sendOtp'])->name('password.email');
+    Route::get('/verify-otp', [PasswordResetController::class, 'showOtpForm'])->name('password.otp.form');
+    Route::post('/verify-otp', [PasswordResetController::class, 'verifyOtp'])->name('password.otp.verify');
+    Route::get('/reset-password', [PasswordResetController::class, 'showResetForm'])->name('password.reset.form');
+    Route::post('/reset-password', [PasswordResetController::class, 'reset'])->name('password.update');
 });
 
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
