@@ -83,4 +83,5 @@ Route::middleware(['auth', 'role:manajer'])->prefix('manajer')->name('manajer.')
     Route::delete('/kasir/{kasir}', [KasirController::class, 'destroy'])->name('kasir.destroy');
 
     Route::get('/reports', [ReportController::class, 'index'])->name('reports');
+    Route::get('/reports/export-excel', [ReportController::class, 'exportExcel'])->name('reports.excel');
 });

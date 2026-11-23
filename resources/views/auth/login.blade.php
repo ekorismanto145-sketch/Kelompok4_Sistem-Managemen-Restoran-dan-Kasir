@@ -1,10 +1,24 @@
 <x-app-layout title="Masuk · PesanAja">
     <div class="flex min-h-screen items-center justify-center px-4 py-10">
         <div class="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h1 class="text-center text-2xl font-extrabold">
-                Pesan<span class="text-[#E4572E]">Aja</span>
-            </h1>
-            <p class="mt-1 text-center text-xs text-slate-500">Masuk untuk memesan atau mengelola antrian</p>
+            <div class="flex flex-col items-center">
+                <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#E4572E] text-white shadow-sm">
+                    <svg width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6c-4.418 0-8 3.134-8 7h16c0-3.866-3.582-7-8-7zm0-2v2m-9 9h18m-2 0a2 2 0 01-2 2H7a2 2 0 01-2-2" />
+                    </svg>
+                </span>
+                <h1 class="mt-3 text-center text-2xl font-extrabold">
+                    Pesan<span class="text-[#E4572E]">Aja</span>
+                </h1>
+                <p class="mt-1 text-center text-xs text-slate-500">Masuk untuk memesan atau mengelola antrian</p>
+            </div>
+
+            <div class="mt-4 rounded-xl border border-slate-100 bg-slate-50 p-3 text-xs leading-relaxed text-slate-600">
+                <p class="font-semibold text-slate-700"></p>
+                <p class="mt-1">
+                    Platform pemesanan & kasir restoran digital. Pilih menu favorit, atur level pedas, pesan untuk <span class="font-medium">Dine-in</span> atau <span class="font-medium">Take-away</span>, dan pantau status pesanan secara langsung.
+                </p>
+            </div>
 
             <form method="POST" action="{{ route('login') }}" class="mt-6 space-y-4">
                 @csrf

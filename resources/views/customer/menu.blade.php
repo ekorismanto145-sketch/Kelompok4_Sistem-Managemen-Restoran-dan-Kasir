@@ -1,6 +1,7 @@
 <x-app-layout title="Menu · PesanAja">
     <div x-data="{
         drawerOpen: false,
+        mobileCartOpen: false,
         search: '{{ request('search', '') }}',
         cart: [],
         sheetOpen: false,
@@ -39,6 +40,22 @@
         get totalPrice() {
             return this.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
         },
+        incrementCartItem(idx) {
+            if (this.cart[idx] && this.cart[idx].qty < 1000) {
+                this.cart[idx].qty++;
+            }
+        },
+        decrementCartItem(idx) {
+            if (!this.cart[idx]) return;
+            if (this.cart[idx].qty > 1) {
+                this.cart[idx].qty--;
+            } else {
+                this.cart.splice(idx, 1);
+                if (this.cart.length === 0) {
+                    this.mobileCartOpen = false;
+                }
+            }
+        },
         formatRp(val) {
             return 'Rp' + Number(val).toLocaleString('id-ID');
         }
@@ -46,8 +63,13 @@
         {{-- Header --}}
         <header class="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
             <div class="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3">
-                <a href="{{ route('customer.menu') }}" class="text-xl font-extrabold tracking-tight">
-                    Pesan<span class="text-[#E4572E]">Aja</span>
+                <a href="{{ route('customer.menu') }}" class="flex items-center gap-2 text-xl font-extrabold tracking-tight">
+                    <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-[#E4572E] text-white shadow-sm">
+                        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6c-4.418 0-8 3.134-8 7h16c0-3.866-3.582-7-8-7zm0-2v2m-9 9h18m-2 0a2 2 0 01-2 2H7a2 2 0 01-2-2" />
+                        </svg>
+                    </span>
+                    <span>Pesan<span class="text-[#E4572E]">Aja</span></span>
                 </a>
 
                 <form method="GET" action="{{ route('customer.menu') }}" class="min-w-0 flex-1 max-w-md">
@@ -155,12 +177,17 @@
                     <div class="mt-4 space-y-3" x-show="cart.length > 0">
                         <template x-for="(item, idx) in cart" :key="idx">
                             <div class="flex items-start justify-between gap-2 border-b border-slate-100 pb-2 text-sm">
-                                <div>
-                                    <p class="font-semibold" x-text="`${item.qty}x ${item.name}`"></p>
+                                <div class="min-w-0 flex-1">
+                                    <p class="font-semibold" x-text="item.name"></p>
                                     <p class="text-xs text-slate-500" x-show="item.spicy_level !== null" x-text="`Level ${item.spicy_level}`"></p>
                                     <p class="text-xs text-slate-400" x-show="item.note" x-text="item.note"></p>
+                                    <div class="mt-1.5 flex items-center gap-2">
+                                        <button type="button" @click="decrementCartItem(idx)" class="flex h-6 w-6 items-center justify-center rounded-lg border border-slate-200 text-xs font-bold hover:bg-slate-50">−</button>
+                                        <span class="w-6 text-center text-xs font-bold" x-text="item.qty"></span>
+                                        <button type="button" @click="incrementCartItem(idx)" class="flex h-6 w-6 items-center justify-center rounded-lg border border-slate-200 text-xs font-bold hover:bg-slate-50">+</button>
+                                    </div>
                                 </div>
-                                <span class="font-semibold" x-text="formatRp(item.price * item.qty)"></span>
+                                <span class="shrink-0 font-semibold" x-text="formatRp(item.price * item.qty)"></span>
                             </div>
                         </template>
                         <div class="space-y-1 border-t border-slate-100 pt-2 text-xs text-slate-500">
@@ -214,9 +241,81 @@
                     <span class="mx-1">·</span>
                     <span class="font-bold" x-text="formatRp(totalPrice)"></span>
                 </div>
-                <button type="button" class="rounded-xl bg-[#E4572E] px-5 py-2.5 text-sm font-bold text-white">
+                <button type="button" @click="mobileCartOpen = true" class="rounded-xl bg-[#E4572E] px-5 py-2.5 text-sm font-bold text-white hover:bg-[#d14922]">
                     Lihat
                 </button>
+            </div>
+        </div>
+
+        {{-- Mobile Cart Bottom Sheet --}}
+        <div x-show="mobileCartOpen" x-cloak class="fixed inset-0 z-40 flex items-end justify-center bg-slate-900/50 lg:hidden">
+            <div @click.outside="mobileCartOpen = false" class="max-h-[85vh] w-full overflow-y-auto rounded-t-2xl bg-white p-5">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <h2 class="text-lg font-bold">Keranjang</h2>
+                    <button type="button" @click="mobileCartOpen = false" class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600">✕</button>
+                </div>
+
+                <template x-if="cart.length === 0">
+                    <p class="mt-4 text-sm text-slate-500">Belum ada item dipilih.</p>
+                </template>
+
+                <div class="mt-4 space-y-3" x-show="cart.length > 0">
+                    <template x-for="(item, idx) in cart" :key="idx">
+                        <div class="flex items-start justify-between gap-2 border-b border-slate-100 pb-2 text-sm">
+                            <div class="min-w-0 flex-1">
+                                <p class="font-semibold" x-text="item.name"></p>
+                                <p class="text-xs text-slate-500" x-show="item.spicy_level !== null" x-text="`Level ${item.spicy_level}`"></p>
+                                <p class="text-xs text-slate-400" x-show="item.note" x-text="item.note"></p>
+                                <div class="mt-1.5 flex items-center gap-2">
+                                    <button type="button" @click="decrementCartItem(idx)" class="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 text-xs font-bold hover:bg-slate-50">−</button>
+                                    <span class="w-6 text-center text-xs font-bold" x-text="item.qty"></span>
+                                    <button type="button" @click="incrementCartItem(idx)" class="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 text-xs font-bold hover:bg-slate-50">+</button>
+                                </div>
+                            </div>
+                            <span class="shrink-0 font-semibold" x-text="formatRp(item.price * item.qty)"></span>
+                        </div>
+                    </template>
+
+                    <div class="space-y-1 border-t border-slate-100 pt-2 text-xs text-slate-500">
+                        <div class="flex justify-between"><span>Subtotal</span><span x-text="formatRp(totalPrice)"></span></div>
+                        <div class="flex justify-between"><span>Pajak (10%)</span><span x-text="formatRp(Math.round(totalPrice * 0.10))"></span></div>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-1 text-base font-bold">
+                        <span>Total Pembayaran</span>
+                        <span class="text-[#E4572E]" x-text="formatRp(totalPrice + Math.round(totalPrice * 0.10))"></span>
+                    </div>
+
+                    <form method="POST" action="{{ route('customer.checkout') }}" class="mt-3 space-y-2.5" x-data="{ type: 'dine_in', paymentMethod: 'midtrans' }">
+                        @csrf
+                        <template x-for="(item, idx) in cart" :key="idx">
+                            <div>
+                                <input type="hidden" :name="`items[${idx}][menu_id]`" :value="item.id">
+                                <input type="hidden" :name="`items[${idx}][quantity]`" :value="item.qty">
+                                <input type="hidden" :name="`items[${idx}][spicy_level]`" :value="item.spicy_level ?? 0">
+                                <input type="hidden" :name="`items[${idx}][note]`" :value="item.note">
+                            </div>
+                        </template>
+
+                        <div class="grid grid-cols-2 gap-2 text-xs font-semibold">
+                            <button type="button" @click="type = 'dine_in'" :class="type === 'dine_in' ? 'bg-[#E4572E] text-white' : 'bg-slate-100 text-slate-700'" class="rounded-lg py-2">Dine-in</button>
+                            <button type="button" @click="type = 'take_away'" :class="type === 'take_away' ? 'bg-[#E4572E] text-white' : 'bg-slate-100 text-slate-700'" class="rounded-lg py-2">Take-away</button>
+                        </div>
+                        <input type="hidden" name="type" :value="type">
+
+                        <input x-show="type === 'dine_in' && paymentMethod !== 'cash'" type="number" name="table_number" min="1" max="200" inputmode="numeric" placeholder="Nomor Meja (1–200)" :required="type === 'dine_in' && paymentMethod !== 'cash'"
+                               class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs focus:border-[#E4572E] focus:outline-none">
+
+                        <select name="payment_method" x-model="paymentMethod" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs">
+                            <option value="midtrans">Pembayaran Non-tunai</option>
+                            <option value="cash">Pembayaran Tunai di Kasir</option>
+                        </select>
+
+                        <button type="submit" class="w-full rounded-xl bg-[#E4572E] py-3 text-sm font-bold text-white hover:bg-[#d14922]">
+                            Checkout
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
 
@@ -273,7 +372,14 @@
                 <div @click.outside="drawerOpen = false" class="flex h-full w-64 flex-col justify-between bg-[#1E2A47] p-5 text-white shadow-xl">
                     <div>
                         <div class="flex items-center justify-between">
-                            <span class="text-xl font-extrabold">Pesan<span class="text-[#E4572E]">Aja</span></span>
+                            <span class="flex items-center gap-2 text-xl font-extrabold">
+                                <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-[#E4572E] text-white">
+                                    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6c-4.418 0-8 3.134-8 7h16c0-3.866-3.582-7-8-7zm0-2v2m-9 9h18m-2 0a2 2 0 01-2 2H7a2 2 0 01-2-2" />
+                                    </svg>
+                                </span>
+                                <span>Pesan<span class="text-[#E4572E]">Aja</span></span>
+                            </span>
                             <button type="button" @click="drawerOpen = false" class="text-slate-300 hover:text-white">✕</button>
                         </div>
                         <nav class="mt-8 space-y-1 text-sm">

@@ -26,5 +26,11 @@
     @endif
 
     {{ $slot }}
+
+    <footer class="border-t border-slate-200 bg-white py-4 text-center text-xs text-slate-500 print:hidden">
+        <div class="mx-auto max-w-7xl px-4">
+            &copy; {{ date('Y') }} <span class="font-bold text-[#1E2A47]">Pesan<span class="text-[#E4572E]">Aja</span></span> · Sistem Pemesanan &amp; Kasir Restoran Digital
+        </div>
+    </footer>
 </body>
 </html>
