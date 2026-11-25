@@ -57,7 +57,7 @@
             <div class="space-y-2 text-sm">
                 @foreach ($order->items as $item)
                     <div class="flex justify-between">
-                        <span>{{ $item->quantity }}x {{ $item->menu_name }} @if(!is_null($item->spicy_level)) (Lv{{ $item->spicy_level }}) @endif</span>
+                        <span>{{ $item->quantity }}x {{ $item->menu_name }} @if(!is_null($item->spicy_level)) (Lv{{ $item->spicy_level }}) @endif @if($item->temperature) ({{ ucfirst($item->temperature) }}) @endif</span>
                         <x-price :amount="$item->price * $item->quantity" class="font-semibold" />
                     </div>
                 @endforeach

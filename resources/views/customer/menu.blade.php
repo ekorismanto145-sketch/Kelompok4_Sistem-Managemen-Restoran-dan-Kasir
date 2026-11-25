@@ -7,6 +7,7 @@
         sheetOpen: false,
         selectedMenu: null,
         spicyLevel: 0,
+        temperature: 'ice',
         note: '',
         qty: 1,
         extraFee(lvl) {
@@ -17,6 +18,7 @@
         openMenu(menu) {
             this.selectedMenu = menu;
             this.spicyLevel = 0;
+            this.temperature = 'ice';
             this.note = '';
             this.qty = 1;
             this.sheetOpen = true;
@@ -26,13 +28,22 @@
             this.cart.push({
                 id: this.selectedMenu.id,
                 name: this.selectedMenu.name,
+                base_price: this.selectedMenu.price,
                 price: this.selectedMenu.price + extra,
                 has_spicy_level: this.selectedMenu.has_spicy_level,
                 spicy_level: this.selectedMenu.has_spicy_level ? this.spicyLevel : null,
+                has_temperature_option: this.selectedMenu.has_temperature_option,
+                temperature: this.selectedMenu.has_temperature_option ? this.temperature : null,
                 note: this.note,
                 qty: this.qty,
             });
             this.sheetOpen = false;
+        },
+        updateCartSpicyLevel(idx, lvl) {
+            const item = this.cart[idx];
+            if (!item || !item.has_spicy_level) return;
+            item.spicy_level = lvl;
+            item.price = item.base_price + this.extraFee(lvl);
         },
         get totalItems() {
             return this.cart.reduce((sum, item) => sum + item.qty, 0);
@@ -117,13 +128,29 @@
 
         {{-- Main Content + Desktop Sticky Cart --}}
         <main class="mx-auto max-w-7xl px-4 pt-5 lg:grid lg:grid-cols-12 lg:gap-6">
-            <section class="lg:col-span-8">
+            @guest
+                <div class="mb-2 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:col-span-12">
+                    <div class="space-y-1">
+                        <span class="inline-flex items-center rounded-full bg-[#E4572E]/10 px-2.5 py-0.5 text-xs font-semibold text-[#E4572E]">
+                            Menu Restoran
+                        </span>
+                        <h1 class="text-xl font-extrabold tracking-tight text-[#1E2A47] sm:text-2xl">
+                            Selamat Datang di Pesan<span class="text-[#E4572E]">Aja</span>
+                        </h1>
+                        <p class="max-w-2xl text-sm text-slate-500">
+                            Lihat daftar menu makanan dan minuman kami. Masuk atau daftar akun terlebih dahulu untuk mulai memesan.
+                        </p>
+                    </div>
+                </div>
+            @endguest
+
+            <section class="{{ auth()->check() ? 'lg:col-span-8' : 'lg:col-span-12' }}">
                 @if ($menus->isEmpty())
                     <div class="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center text-slate-500">
                         Menu tidak ditemukan.
                     </div>
                 @else
-                    <div class="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
+                    <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 {{ auth()->check() ? 'lg:grid-cols-3 xl:grid-cols-4' : 'lg:grid-cols-4 xl:grid-cols-5' }}">
                         @foreach ($menus as $menu)
                             <div x-show="search.trim() === '' || @js(strtolower($menu->name)).includes(search.toLowerCase())"
                                  class="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-3 shadow-sm {{ !$menu->is_available ? 'opacity-60' : '' }}">
@@ -154,12 +181,27 @@
 
                                 <div class="mt-3 flex items-center justify-between gap-2">
                                     <x-price :amount="$menu->price" class="text-sm font-bold text-[#E4572E]" />
-                                    <button type="button"
-                                            @disabled(!$menu->is_available)
-                                            @click="openMenu({{ Js::from($menu) }})"
-                                            class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#E4572E] text-lg font-bold text-white transition hover:bg-[#d14922] disabled:cursor-not-allowed disabled:bg-slate-300">
-                                        +
-                                    </button>
+                                    @auth
+                                        <button type="button"
+                                                @disabled(!$menu->is_available)
+                                                @click="openMenu({{ Js::from($menu) }})"
+                                                class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#E4572E] text-lg font-bold text-white transition hover:bg-[#d14922] disabled:cursor-not-allowed disabled:bg-slate-300">
+                                            +
+                                        </button>
+                                    @else
+                                        @if ($menu->is_available)
+                                            <a href="{{ route('login') }}"
+                                               title="Masuk untuk memesan"
+                                               class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#E4572E] text-lg font-bold text-white transition hover:bg-[#d14922]">
+                                                +
+                                            </a>
+                                        @else
+                                            <button type="button" disabled
+                                                    class="flex h-11 w-11 shrink-0 cursor-not-allowed items-center justify-center rounded-xl bg-slate-300 text-lg font-bold text-white">
+                                                +
+                                            </button>
+                                        @endif
+                                    @endauth
                                 </div>
                             </div>
                         @endforeach
@@ -168,6 +210,7 @@
             </section>
 
             {{-- Desktop Cart Sidebar --}}
+            @auth
             <aside class="hidden lg:col-span-4 lg:block">
                 <div class="sticky top-28 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                     <h2 class="text-lg font-bold">Keranjang</h2>
@@ -179,7 +222,16 @@
                             <div class="flex items-start justify-between gap-2 border-b border-slate-100 pb-2 text-sm">
                                 <div class="min-w-0 flex-1">
                                     <p class="font-semibold" x-text="item.name"></p>
-                                    <p class="text-xs text-slate-500" x-show="item.spicy_level !== null" x-text="`Level ${item.spicy_level}`"></p>
+                                    <div class="mt-1 flex items-center gap-1.5 text-xs text-slate-500" x-show="item.has_spicy_level">
+                                        <span>Pedas:</span>
+                                        <select :value="item.spicy_level" @change="updateCartSpicyLevel(idx, Number($event.target.value))"
+                                                class="rounded-lg border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-xs font-semibold text-slate-700">
+                                            <template x-for="lvl in [0,1,2,3,4,5,6,7,8]" :key="lvl">
+                                                <option :value="lvl" :selected="item.spicy_level === lvl" x-text="`Lv ${lvl}${lvl > 6 ? ' (+2rb)' : (lvl > 4 ? ' (+1rb)' : '')}`"></option>
+                                            </template>
+                                        </select>
+                                    </div>
+                                    <p class="text-xs text-slate-500" x-show="item.temperature !== null" x-text="item.temperature === 'hot' ? 'Hot' : 'Ice'"></p>
                                     <p class="text-xs text-slate-400" x-show="item.note" x-text="item.note"></p>
                                     <div class="mt-1.5 flex items-center gap-2">
                                         <button type="button" @click="decrementCartItem(idx)" class="flex h-6 w-6 items-center justify-center rounded-lg border border-slate-200 text-xs font-bold hover:bg-slate-50">−</button>
@@ -205,6 +257,8 @@
                                     <input type="hidden" :name="`items[${idx}][menu_id]`" :value="item.id">
                                     <input type="hidden" :name="`items[${idx}][quantity]`" :value="item.qty">
                                     <input type="hidden" :name="`items[${idx}][spicy_level]`" :value="item.spicy_level ?? 0">
+                                <input type="hidden" :name="`items[${idx}][temperature]`" :value="item.temperature ?? ''">
+                                    <input type="hidden" :name="`items[${idx}][temperature]`" :value="item.temperature ?? ''">
                                     <input type="hidden" :name="`items[${idx}][note]`" :value="item.note">
                                 </div>
                             </template>
@@ -230,6 +284,7 @@
                     </div>
                 </div>
             </aside>
+            @endauth
         </main>
 
         {{-- Mobile Bottom Cart Bar --}}
@@ -264,7 +319,16 @@
                         <div class="flex items-start justify-between gap-2 border-b border-slate-100 pb-2 text-sm">
                             <div class="min-w-0 flex-1">
                                 <p class="font-semibold" x-text="item.name"></p>
-                                <p class="text-xs text-slate-500" x-show="item.spicy_level !== null" x-text="`Level ${item.spicy_level}`"></p>
+                                <div class="mt-1 flex items-center gap-1.5 text-xs text-slate-500" x-show="item.has_spicy_level">
+                                    <span>Pedas:</span>
+                                    <select :value="item.spicy_level" @change="updateCartSpicyLevel(idx, Number($event.target.value))"
+                                            class="rounded-lg border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-xs font-semibold text-slate-700">
+                                        <template x-for="lvl in [0,1,2,3,4,5,6,7,8]" :key="lvl">
+                                            <option :value="lvl" :selected="item.spicy_level === lvl" x-text="`Lv ${lvl}${lvl > 6 ? ' (+2rb)' : (lvl > 4 ? ' (+1rb)' : '')}`"></option>
+                                        </template>
+                                    </select>
+                                </div>
+                                <p class="text-xs text-slate-500" x-show="item.temperature !== null" x-text="item.temperature === 'hot' ? 'Hot' : 'Ice'"></p>
                                 <p class="text-xs text-slate-400" x-show="item.note" x-text="item.note"></p>
                                 <div class="mt-1.5 flex items-center gap-2">
                                     <button type="button" @click="decrementCartItem(idx)" class="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 text-xs font-bold hover:bg-slate-50">−</button>
@@ -293,6 +357,7 @@
                                 <input type="hidden" :name="`items[${idx}][menu_id]`" :value="item.id">
                                 <input type="hidden" :name="`items[${idx}][quantity]`" :value="item.qty">
                                 <input type="hidden" :name="`items[${idx}][spicy_level]`" :value="item.spicy_level ?? 0">
+                                <input type="hidden" :name="`items[${idx}][temperature]`" :value="item.temperature ?? ''">
                                 <input type="hidden" :name="`items[${idx}][note]`" :value="item.note">
                             </div>
                         </template>
@@ -330,6 +395,22 @@
                                 <p class="text-sm text-slate-500" x-text="selectedMenu.description"></p>
                             </div>
                             <span class="font-bold text-[#E4572E]" x-text="formatRp(selectedMenu.price)"></span>
+                        </div>
+
+                        <div x-show="selectedMenu.has_temperature_option" class="mt-4">
+                            <label class="text-xs font-bold uppercase tracking-wide text-slate-500">Pilih penyajian</label>
+                            <div class="mt-2 grid grid-cols-2 gap-2">
+                                <button type="button" @click="temperature = 'hot'"
+                                        :class="temperature === 'hot' ? 'bg-[#E4572E] text-white border-[#E4572E]' : 'bg-slate-50 text-slate-700 border-slate-200'"
+                                        class="rounded-xl border py-2 text-xs font-bold">
+                                    Hot
+                                </button>
+                                <button type="button" @click="temperature = 'ice'"
+                                        :class="temperature === 'ice' ? 'bg-[#E4572E] text-white border-[#E4572E]' : 'bg-slate-50 text-slate-700 border-slate-200'"
+                                        class="rounded-xl border py-2 text-xs font-bold">
+                                    Ice
+                                </button>
+                            </div>
                         </div>
 
                         <div x-show="selectedMenu.has_spicy_level" class="mt-4">

@@ -18,7 +18,7 @@ use App\Http\Controllers\Manajer\ReportController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', fn () => auth()->check() ? redirect()->route('customer.menu') : redirect()->route('login'));
+Route::get('/', [MenuController::class, 'index'])->name('home');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -41,7 +41,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile/avatar', [ProfileController::class, 'destroyAvatar'])->name('profile.avatar.destroy');
 });
 
-Route::middleware('auth')->prefix('menu')->name('customer.')->group(function () {
+Route::prefix('menu')->name('customer.')->group(function () {
     Route::get('/', [MenuController::class, 'index'])->name('menu');
 });
 

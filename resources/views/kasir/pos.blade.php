@@ -5,6 +5,7 @@
         sheetOpen: false,
         selectedMenu: null,
         spicyLevel: 0,
+        temperature: 'ice',
         note: '',
         qty: 1,
         extraFee(lvl) {
@@ -15,6 +16,7 @@
         openMenu(menu) {
             this.selectedMenu = menu;
             this.spicyLevel = 0;
+            this.temperature = 'ice';
             this.note = '';
             this.qty = 1;
             this.sheetOpen = true;
@@ -27,6 +29,8 @@
                 price: this.selectedMenu.price + extra,
                 has_spicy_level: this.selectedMenu.has_spicy_level,
                 spicy_level: this.selectedMenu.has_spicy_level ? this.spicyLevel : null,
+                has_temperature_option: this.selectedMenu.has_temperature_option,
+                temperature: this.selectedMenu.has_temperature_option ? this.temperature : null,
                 note: this.note,
                 qty: this.qty,
             });
@@ -122,6 +126,7 @@
                                     <input type="hidden" :name="`items[${idx}][menu_id]`" :value="item.id">
                                     <input type="hidden" :name="`items[${idx}][quantity]`" :value="item.qty">
                                     <input type="hidden" :name="`items[${idx}][spicy_level]`" :value="item.spicy_level ?? 0">
+                                    <input type="hidden" :name="`items[${idx}][temperature]`" :value="item.temperature ?? ''">
                                     <input type="hidden" :name="`items[${idx}][note]`" :value="item.note">
                                 </div>
                             </template>
@@ -144,6 +149,22 @@
                 <template x-if="selectedMenu">
                     <div>
                         <h3 class="text-lg font-bold" x-text="selectedMenu.name"></h3>
+                        <div x-show="selectedMenu.has_temperature_option" class="mt-3">
+                            <label class="text-xs font-bold text-slate-500">Pilih penyajian</label>
+                            <div class="mt-1.5 grid grid-cols-2 gap-1.5">
+                                <button type="button" @click="temperature = 'hot'"
+                                        :class="temperature === 'hot' ? 'bg-[#E4572E] text-white' : 'bg-slate-50 text-slate-700'"
+                                        class="rounded-lg border border-slate-200 py-1.5 text-xs font-bold">
+                                    Hot
+                                </button>
+                                <button type="button" @click="temperature = 'ice'"
+                                        :class="temperature === 'ice' ? 'bg-[#E4572E] text-white' : 'bg-slate-50 text-slate-700'"
+                                        class="rounded-lg border border-slate-200 py-1.5 text-xs font-bold">
+                                    Ice
+                                </button>
+                            </div>
+                        </div>
+
                         <div x-show="selectedMenu.has_spicy_level" class="mt-3">
                             <label class="text-xs font-bold text-slate-500">Pilih level pedas</label>
                             <div class="mt-2 grid grid-cols-5 gap-2">

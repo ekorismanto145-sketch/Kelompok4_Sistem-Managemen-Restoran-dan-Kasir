@@ -19,6 +19,7 @@ class CheckoutController extends Controller
             'items.*.menu_id' => ['required', 'integer', 'exists:menus,id'],
             'items.*.quantity' => ['required', 'integer', 'min:1'],
             'items.*.spicy_level' => ['nullable', 'integer', 'min:0', 'max:8'],
+            'items.*.temperature' => ['nullable', 'in:hot,ice'],
             'items.*.note' => ['nullable', 'string', 'max:255'],
         ]);
 

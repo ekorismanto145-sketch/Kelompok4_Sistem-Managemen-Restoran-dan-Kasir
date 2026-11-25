@@ -88,7 +88,7 @@
                             </div>
                             <ul class="mt-2 space-y-0.5 text-xs text-slate-600">
                                 @foreach ($order->items as $item)
-                                    <li>{{ $item->quantity }}x {{ $item->menu_name }} @if(!is_null($item->spicy_level)) Lv{{ $item->spicy_level }} @endif</li>
+                                    <li>{{ $item->quantity }}x {{ $item->menu_name }} @if(!is_null($item->spicy_level)) Lv{{ $item->spicy_level }} @endif @if($item->temperature) ({{ ucfirst($item->temperature) }}) @endif</li>
                                 @endforeach
                             </ul>
                             <form method="POST" action="{{ route('kasir.orders.status', $order) }}" class="mt-3">

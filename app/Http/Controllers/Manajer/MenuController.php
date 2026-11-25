@@ -30,6 +30,7 @@ class MenuController extends Controller
             'image' => ['nullable', 'image', 'max:2048'],
             'is_available' => ['boolean'],
             'has_spicy_level' => ['boolean'],
+            'has_temperature_option' => ['boolean'],
         ]);
 
         if ($request->hasFile('image')) {
@@ -40,6 +41,7 @@ class MenuController extends Controller
 
         $data['is_available'] = $request->boolean('is_available', true);
         $data['has_spicy_level'] = $request->boolean('has_spicy_level');
+        $data['has_temperature_option'] = $request->boolean('has_temperature_option');
 
         Menu::create($data);
 
@@ -56,6 +58,7 @@ class MenuController extends Controller
             'image' => ['nullable', 'image', 'max:2048'],
             'is_available' => ['boolean'],
             'has_spicy_level' => ['boolean'],
+            'has_temperature_option' => ['boolean'],
         ]);
 
         if ($request->hasFile('image')) {
@@ -66,6 +69,7 @@ class MenuController extends Controller
 
         $data['is_available'] = $request->boolean('is_available');
         $data['has_spicy_level'] = $request->boolean('has_spicy_level');
+        $data['has_temperature_option'] = $request->boolean('has_temperature_option');
 
         $menu->update($data);
 

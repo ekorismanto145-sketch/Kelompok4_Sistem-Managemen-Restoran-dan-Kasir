@@ -58,12 +58,13 @@
                     <input type="number" name="price" placeholder="Harga (Rp)" min="0" required class="rounded-xl border border-slate-200 px-3.5 py-2 text-sm">
                     <input type="file" name="image" accept="image/*" class="menu-file-input w-full rounded-xl border border-slate-200 bg-slate-50 p-1.5 text-xs text-slate-600">
                     <input type="text" name="description" placeholder="Deskripsi singkat" class="rounded-xl border border-slate-200 px-3.5 py-2 text-sm sm:col-span-2">
-                    <div class="flex items-center gap-6 py-1 text-sm">
-                        <label class="flex items-center gap-2"><input type="checkbox" name="is_available" value="1" checked> Tersedia</label>
-                        <label class="flex items-center gap-2"><input type="checkbox" name="has_spicy_level" value="1"> Punya Level Pedas</label>
+                    <div class="sm:col-span-2 flex flex-wrap items-center gap-x-6 gap-y-2.5 pt-1 text-sm">
+                        <label class="flex cursor-pointer items-center gap-2 whitespace-nowrap"><input type="checkbox" name="is_available" value="1" checked class="rounded border-slate-300 text-[#E4572E] focus:ring-[#E4572E]"> Tersedia</label>
+                        <label class="flex cursor-pointer items-center gap-2 whitespace-nowrap"><input type="checkbox" name="has_spicy_level" value="1" class="rounded border-slate-300 text-[#E4572E] focus:ring-[#E4572E]"> Punya Level Pedas</label>
+                        <label class="flex cursor-pointer items-center gap-2 whitespace-nowrap"><input type="checkbox" name="has_temperature_option" value="1" class="rounded border-slate-300 text-[#E4572E] focus:ring-[#E4572E]"> Opsi Hot / Ice</label>
                     </div>
-                    <div class="sm:text-right">
-                        <button type="submit" class="rounded-xl bg-[#E4572E] px-5 py-2.5 text-sm font-bold text-white hover:bg-[#d14922]">
+                    <div class="sm:col-span-2 sm:text-right">
+                        <button type="submit" class="w-full rounded-xl bg-[#E4572E] px-5 py-2.5 text-sm font-bold text-white hover:bg-[#d14922] sm:w-auto">
                             Tambah Menu
                         </button>
                     </div>
@@ -89,8 +90,10 @@
 
                                 <p class="text-[11px] font-semibold text-slate-400">{{ $menu->category->name }}</p>
                                 <h3 class="text-sm font-bold leading-snug">{{ $menu->name }}</h3>
-                                @if ($menu->has_spicy_level)
-                                    <p class="mt-0.5 text-xs text-slate-500">Level 0–8</p>
+                                @if ($menu->has_spicy_level || $menu->has_temperature_option)
+                                    <p class="mt-0.5 text-xs text-slate-500">
+                                        {{ collect([$menu->has_spicy_level ? 'Level 0–8' : null, $menu->has_temperature_option ? 'Hot / Ice' : null])->filter()->implode(' · ') }}
+                                    </p>
                                 @elseif ($menu->description)
                                     <p class="mt-0.5 line-clamp-2 text-xs text-slate-500">{{ $menu->description }}</p>
                                 @endif
@@ -123,9 +126,10 @@
                                 <input type="number" name="price" value="{{ $menu->price }}" min="0" required class="w-full rounded-xl border border-slate-200 px-2.5 py-1.5 text-xs">
                                 <input type="file" name="image" accept="image/*" class="menu-file-input w-full rounded-xl border border-slate-200 bg-slate-50 p-1 text-[11px] text-slate-600">
                                 <input type="text" name="description" value="{{ $menu->description }}" placeholder="Deskripsi" class="w-full rounded-xl border border-slate-200 px-2.5 py-1.5 text-xs">
-                                <div class="flex flex-col gap-1.5 text-xs">
-                                    <label class="flex items-center gap-2"><input type="checkbox" name="is_available" value="1" @checked($menu->is_available)> Tersedia</label>
-                                    <label class="flex items-center gap-2"><input type="checkbox" name="has_spicy_level" value="1" @checked($menu->has_spicy_level)> Punya Level Pedas</label>
+                                <div class="flex flex-col gap-2.5 py-1.5 text-xs">
+                                    <label class="flex cursor-pointer items-center gap-2"><input type="checkbox" name="is_available" value="1" @checked($menu->is_available) class="rounded border-slate-300 text-[#E4572E] focus:ring-[#E4572E]"> Tersedia</label>
+                                    <label class="flex cursor-pointer items-center gap-2"><input type="checkbox" name="has_spicy_level" value="1" @checked($menu->has_spicy_level) class="rounded border-slate-300 text-[#E4572E] focus:ring-[#E4572E]"> Punya Level Pedas</label>
+                                    <label class="flex cursor-pointer items-center gap-2"><input type="checkbox" name="has_temperature_option" value="1" @checked($menu->has_temperature_option) class="rounded border-slate-300 text-[#E4572E] focus:ring-[#E4572E]"> Opsi Hot / Ice</label>
                                 </div>
                                 <button type="submit" class="w-full rounded-xl bg-[#2A9D8F] py-2 text-xs font-bold text-white hover:opacity-90">Simpan</button>
                             </form>

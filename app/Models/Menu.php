@@ -16,6 +16,7 @@ class Menu extends Model
         'image_url',
         'is_available',
         'has_spicy_level',
+        'has_temperature_option',
     ];
 
     protected function casts(): array
@@ -24,6 +25,7 @@ class Menu extends Model
             'price' => 'integer',
             'is_available' => 'boolean',
             'has_spicy_level' => 'boolean',
+            'has_temperature_option' => 'boolean',
         ];
     }
 

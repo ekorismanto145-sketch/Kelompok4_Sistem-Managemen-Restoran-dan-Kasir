@@ -14,6 +14,7 @@ class OrderItem extends Model
         'price',
         'quantity',
         'spicy_level',
+        'temperature',
         'note',
     ];
 

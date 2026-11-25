@@ -36,6 +36,9 @@ class OrderService
 
                 $qty = max(1, (int) $item['quantity']);
                 $spicyLevel = $menu->has_spicy_level ? (int) ($item['spicy_level'] ?? 0) : null;
+                $temperature = $menu->has_temperature_option
+                    ? (in_array($item['temperature'] ?? null, ['hot', 'ice'], true) ? $item['temperature'] : 'ice')
+                    : null;
                 $extraFee = match (true) {
                     $spicyLevel !== null && $spicyLevel > 6 => 2000,
                     $spicyLevel !== null && $spicyLevel > 4 => 1000,
@@ -50,6 +53,7 @@ class OrderService
                     'price' => $unitPrice,
                     'quantity' => $qty,
                     'spicy_level' => $spicyLevel,
+                    'temperature' => $temperature,
                     'note' => $item['note'] ?? null,
                 ];
             }

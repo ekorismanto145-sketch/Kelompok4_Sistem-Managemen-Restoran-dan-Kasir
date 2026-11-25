@@ -44,7 +44,7 @@
                             <div x-show="open" x-cloak class="mt-3 border-t border-slate-100 pt-3 text-xs text-slate-600 space-y-1">
                                 @foreach ($order->items as $item)
                                     <div class="flex justify-between">
-                                        <span>{{ $item->quantity }}x {{ $item->menu_name }} @if(!is_null($item->spicy_level)) (Lv{{ $item->spicy_level }}) @endif</span>
+                                        <span>{{ $item->quantity }}x {{ $item->menu_name }} @if(!is_null($item->spicy_level)) (Lv{{ $item->spicy_level }}) @endif @if($item->temperature) ({{ ucfirst($item->temperature) }}) @endif</span>
                                         <x-price :amount="$item->price * $item->quantity" />
                                     </div>
                                 @endforeach
