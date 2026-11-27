@@ -26,14 +26,10 @@ class DashboardController extends Controller
         $ordersToday = (clone $paidToday)->count();
         $avgOrder = $ordersToday > 0 ? (int) round($omzetToday / $ordersToday) : 0;
 
-        $hourExpr = DB::getDriverName() === 'pgsql'
-            ? 'EXTRACT(HOUR FROM created_at)'
-            : 'HOUR(created_at)';
-
         $hourlyRaw = (clone $paidToday)
-            ->select(DB::raw("{$hourExpr} as hour"), DB::raw('COUNT(*) as total'))
-            ->groupBy('hour')
-            ->pluck('total', 'hour');
+            ->get(['created_at'])
+            ->groupBy(fn (Order $order) => (int) $order->created_at->timezone(config('app.timezone'))->format('G'))
+            ->map->count();
 
         $hourlyOrders = collect(range(10, 22))->mapWithKeys(fn (int $h) => [
             str_pad((string) $h, 2, '0', STR_PAD_LEFT) => (int) ($hourlyRaw[$h] ?? 0),

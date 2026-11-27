@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class OrderService
 {
@@ -36,7 +37,11 @@ class OrderService
                 abort_unless($menu !== null, 422, 'Menu tidak tersedia.');
 
                 $qty = max(1, (int) $item['quantity']);
-                abort_unless($menu->stock >= $qty, 422, "Stok {$menu->name} tidak mencukupi.");
+                if ($menu->stock < $qty) {
+                    throw ValidationException::withMessages([
+                        'items' => "Stok {$menu->name} tidak mencukupi. Sisa stok: {$menu->stock}.",
+                    ]);
+                }
                 $menu->decrement('stock', $qty);
                 $spicyLevel = $menu->has_spicy_level ? (int) ($item['spicy_level'] ?? 0) : null;
                 $temperature = $menu->has_temperature_option
@@ -96,6 +101,7 @@ class OrderService
             $todayCount = Order::whereDate('paid_at', today())
                 ->whereNotNull('queue_number')
                 ->lockForUpdate()
+                ->pluck('id')
                 ->count();
 
             $queueNumber = 'A-'.str_pad((string) ($todayCount + 1), 3, '0', STR_PAD_LEFT);

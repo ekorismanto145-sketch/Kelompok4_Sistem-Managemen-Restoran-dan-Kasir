@@ -72,7 +72,7 @@
                 </form>
 
                 {{-- Daftar Menu (Grid seperti Customer) --}}
-                <div class="mt-6 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
+                <div class="mt-6 grid grid-cols-2 items-start gap-3 md:grid-cols-3 lg:grid-cols-4">
                     @foreach ($menus as $menu)
                         <div x-data="{ editing: false }" class="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-3 shadow-sm {{ !$menu->is_available ? 'opacity-75' : '' }}">
                             <div>

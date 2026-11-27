@@ -1,4 +1,33 @@
 <x-app-layout title="Menu · PesanAja">
+    @if ($errors->any() || session('error'))
+        <div x-data="{ show: true }" x-show="show" x-transition
+            class="mx-auto w-full max-w-7xl px-4 pt-4 sm:px-6 lg:px-8">
+            <div class="flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50/95 p-4 text-red-800 shadow-sm">
+                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-600">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+                    </svg>
+                </div>
+                <div class="min-w-0 flex-1 text-sm">
+                    <p class="font-semibold text-red-900">Pesanan tidak dapat diproses</p>
+                    <ul class="mt-1 space-y-0.5 text-red-700">
+                        @if (session('error'))
+                            <li class="break-words">{{ session('error') }}</li>
+                        @endif
+                        @foreach ($errors->all() as $error)
+                            <li class="break-words">{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+                <button type="button" @click="show = false" aria-label="Tutup peringatan"
+                    class="shrink-0 rounded-lg p-1 text-red-500 transition hover:bg-red-100 hover:text-red-700">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    @endif
     <div x-data="{
         drawerOpen: false,
         mobileCartOpen: false,
@@ -209,7 +238,12 @@
                                     <p class="text-xs text-slate-400" x-show="item.note" x-text="item.note"></p>
                                     <div class="mt-1.5 flex items-center gap-2">
                                         <button type="button" @click="decrementCartItem(idx)" class="flex h-6 w-6 items-center justify-center rounded-lg border border-slate-200 text-xs font-bold hover:bg-slate-50">−</button>
-                                        <span class="w-6 text-center text-xs font-bold" x-text="item.qty"></span>
+                                        <input type="number" min="1" step="1" inputmode="numeric"
+                                            x-model.number="item.qty"
+                                            @keydown="if (['e', 'E', '+', '-', '.'].includes($event.key)) $event.preventDefault()"
+                                            @input="item.qty = String(item.qty).replace(/[^0-9]/g, ''); item.qty = item.qty === '' ? '' : Math.max(1, parseInt(item.qty, 10))"
+                                            @blur="if (!item.qty || item.qty < 1) item.qty = 1"
+                                            class="w-10 rounded-lg border border-slate-200 py-0.5 text-center text-xs font-bold focus:border-slate-400 focus:outline-none">
                                         <button type="button" @click="incrementCartItem(idx)" class="flex h-6 w-6 items-center justify-center rounded-lg border border-slate-200 text-xs font-bold hover:bg-slate-50">+</button>
                                     </div>
                                 </div>
@@ -310,7 +344,12 @@
                                 <p class="text-xs text-slate-400" x-show="item.note" x-text="item.note"></p>
                                 <div class="mt-1.5 flex items-center gap-2">
                                     <button type="button" @click="decrementCartItem(idx)" class="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 text-xs font-bold hover:bg-slate-50">−</button>
-                                    <span class="w-6 text-center text-xs font-bold" x-text="item.qty"></span>
+                                    <input type="number" min="1" step="1" inputmode="numeric"
+                                            x-model.number="item.qty"
+                                            @keydown="if (['e', 'E', '+', '-', '.'].includes($event.key)) $event.preventDefault()"
+                                            @input="item.qty = String(item.qty).replace(/[^0-9]/g, ''); item.qty = item.qty === '' ? '' : Math.max(1, parseInt(item.qty, 10))"
+                                            @blur="if (!item.qty || item.qty < 1) item.qty = 1"
+                                            class="w-10 rounded-lg border border-slate-200 py-0.5 text-center text-xs font-bold focus:border-slate-400 focus:outline-none">
                                     <button type="button" @click="incrementCartItem(idx)" class="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 text-xs font-bold hover:bg-slate-50">+</button>
                                 </div>
                             </div>
@@ -418,7 +457,12 @@
                         <div class="mt-4 flex items-center justify-between gap-3">
                             <div class="flex shrink-0 items-center gap-2">
                                 <button type="button" @click="if (qty > 1) qty--" class="h-11 w-11 rounded-xl border border-slate-200 font-bold">−</button>
-                                <span class="w-8 text-center font-bold" x-text="qty"></span>
+                                <input type="number" min="1" step="1" inputmode="numeric"
+                        x-model.number="qty"
+                        @keydown="if (['e', 'E', '+', '-', '.'].includes($event.key)) $event.preventDefault()"
+                        @input="qty = String(qty).replace(/[^0-9]/g, ''); qty = qty === '' ? '' : Math.max(1, parseInt(qty, 10))"
+                        @blur="if (!qty || qty < 1) qty = 1"
+                        class="h-11 w-16 rounded-xl border border-slate-200 text-center font-bold focus:border-slate-400 focus:outline-none">
                                 <button type="button" @click="qty++" class="h-11 w-11 rounded-xl border border-slate-200 font-bold">+</button>
                             </div>
                             <button type="button" @click="addToCart()"
@@ -448,19 +492,8 @@
                     <nav class="mt-8 space-y-1 text-sm">
                         <a href="{{ route('customer.menu') }}" class="block rounded-xl bg-white/10 px-3.5 py-2.5 font-semibold">Menu</a>
                         <a href="{{ route('customer.orders') }}" class="block rounded-xl px-3.5 py-2.5 text-slate-300 hover:bg-white/5">Riwayat Transaksi</a>
-                        @auth
-                            <a href="{{ route('profile.edit') }}" class="block rounded-xl px-3.5 py-2.5 text-slate-300 hover:bg-white/5">Profile</a>
-                        @endauth
                     </nav>
                 </div>
-                @auth
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" style="background-color: #dc2626; color: #ffffff;" class="w-full rounded-xl px-3.5 py-2.5 text-left text-sm font-semibold hover:opacity-90">
-                            Logout
-                        </button>
-                    </form>
-                @endauth
             </div>
         </div>
     </div>

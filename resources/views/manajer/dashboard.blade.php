@@ -36,7 +36,7 @@
                 <div class="flex flex-wrap items-center justify-between gap-2">
                     <h1 class="text-xl font-extrabold text-[#1E2A47]">Ringkasan hari ini</h1>
                     <span class="rounded-xl border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-slate-600 shadow-sm">
-                        {{ now()->translatedFormat('d M Y') }}
+                        {{ now()->locale('id')->translatedFormat('l, d M Y') }}
                     </span>
                 </div>
 
