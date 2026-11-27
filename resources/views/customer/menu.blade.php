@@ -146,21 +146,6 @@
 
         {{-- Main Content + Desktop Sticky Cart --}}
         <main class="mx-auto max-w-7xl px-4 pt-5 lg:grid lg:grid-cols-12 lg:gap-6">
-            @guest
-                <div class="mb-2 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:col-span-12">
-                    <div class="space-y-1">
-                        <span class="inline-flex items-center rounded-full bg-[#E4572E]/10 px-2.5 py-0.5 text-xs font-semibold text-[#E4572E]">
-                            Menu Restoran
-                        </span>
-                        <h1 class="text-xl font-extrabold tracking-tight text-[#1E2A47] sm:text-2xl">
-                            Selamat Datang di Pesan<span class="text-[#E4572E]">Aja</span>
-                        </h1>
-                        <p class="max-w-2xl text-sm text-slate-500">
-                            Lihat daftar menu makanan dan minuman kami. Masuk atau daftar akun terlebih dahulu untuk mulai memesan.
-                        </p>
-                    </div>
-                </div>
-            @endguest
 
             <section class="lg:col-span-8">
                 @if ($menus->isEmpty())
