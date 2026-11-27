@@ -37,7 +37,7 @@
                         <div x-show="codeSearch.trim() === '' || @js(strtolower($order->code)).includes(codeSearch.toLowerCase())"
                              class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4">
                             <div>
-                                <p class="font-bold">{{ $order->code }} <span class="text-xs font-normal text-slate-400">· {{ $order->user->name }}</span></p>
+                                <p class="font-bold">{{ $order->code }} <span class="text-xs font-normal text-slate-400">· {{ $order->customer_name ?? $order->user?->name ?? 'Pelanggan' }}</span></p>
                                 <p class="text-xs text-slate-500">{{ $order->created_at->format('d M Y H:i') }} · {{ $order->items->sum('quantity') }} item</p>
                             </div>
                             <div class="flex items-center gap-3">

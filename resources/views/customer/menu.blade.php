@@ -92,23 +92,12 @@
                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2 text-sm focus:border-[#E4572E] focus:bg-white focus:outline-none">
                 </form>
 
-                @auth
-                    <button type="button" @click="drawerOpen = true" aria-label="Menu"
-                            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-[#1E2A47] hover:bg-slate-50">
-                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                        </svg>
-                    </button>
-                @else
-                    <div class="flex shrink-0 items-center gap-2">
-                        <a href="{{ route('login') }}" class="rounded-xl border border-slate-200 px-3 py-2 text-sm font-semibold hover:bg-slate-50">
-                            Masuk
-                        </a>
-                        <a href="{{ route('register') }}" class="rounded-xl bg-[#E4572E] px-3 py-2 text-sm font-semibold text-white hover:bg-[#d14922]">
-                            Daftar
-                        </a>
-                    </div>
-                @endauth
+                <button type="button" @click="drawerOpen = true" aria-label="Menu"
+                        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-[#1E2A47] hover:bg-slate-50">
+                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
             </div>
 
             {{-- Category Chips --}}
@@ -144,16 +133,17 @@
                 </div>
             @endguest
 
-            <section class="{{ auth()->check() ? 'lg:col-span-8' : 'lg:col-span-12' }}">
+            <section class="lg:col-span-8">
                 @if ($menus->isEmpty())
                     <div class="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center text-slate-500">
                         Menu tidak ditemukan.
                     </div>
                 @else
-                    <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 {{ auth()->check() ? 'lg:grid-cols-3 xl:grid-cols-4' : 'lg:grid-cols-4 xl:grid-cols-5' }}">
+                    <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
                         @foreach ($menus as $menu)
+                            @php $isOutOfStock = !$menu->is_available || $menu->stock <= 0; @endphp
                             <div x-show="search.trim() === '' || @js(strtolower($menu->name)).includes(search.toLowerCase())"
-                                 class="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-3 shadow-sm {{ !$menu->is_available ? 'opacity-60' : '' }}">
+                                 class="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-3 shadow-sm {{ $isOutOfStock ? 'opacity-60' : '' }}">
                                 <div>
                                     <div class="relative mb-2.5 aspect-square overflow-hidden rounded-xl bg-slate-100">
                                         @if ($menu->image_url)
@@ -164,7 +154,7 @@
                                             </div>
                                         @endif
 
-                                        @if (!$menu->is_available)
+                                        @if ($isOutOfStock)
                                             <span class="absolute inset-0 flex items-center justify-center bg-slate-900/50 text-xs font-bold tracking-wider text-white">
                                                 HABIS
                                             </span>
@@ -181,27 +171,12 @@
 
                                 <div class="mt-3 flex items-center justify-between gap-2">
                                     <x-price :amount="$menu->price" class="text-sm font-bold text-[#E4572E]" />
-                                    @auth
-                                        <button type="button"
-                                                @disabled(!$menu->is_available)
-                                                @click="openMenu({{ Js::from($menu) }})"
-                                                class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#E4572E] text-lg font-bold text-white transition hover:bg-[#d14922] disabled:cursor-not-allowed disabled:bg-slate-300">
-                                            +
-                                        </button>
-                                    @else
-                                        @if ($menu->is_available)
-                                            <a href="{{ route('login') }}"
-                                               title="Masuk untuk memesan"
-                                               class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#E4572E] text-lg font-bold text-white transition hover:bg-[#d14922]">
-                                                +
-                                            </a>
-                                        @else
-                                            <button type="button" disabled
-                                                    class="flex h-11 w-11 shrink-0 cursor-not-allowed items-center justify-center rounded-xl bg-slate-300 text-lg font-bold text-white">
-                                                +
-                                            </button>
-                                        @endif
-                                    @endauth
+                                    <button type="button"
+                                            @disabled($isOutOfStock)
+                                            @click="openMenu({{ Js::from($menu) }})"
+                                            class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#E4572E] text-lg font-bold text-white transition hover:bg-[#d14922] disabled:cursor-not-allowed disabled:bg-slate-300">
+                                        +
+                                    </button>
                                 </div>
                             </div>
                         @endforeach
@@ -210,7 +185,6 @@
             </section>
 
             {{-- Desktop Cart Sidebar --}}
-            @auth
             <aside class="hidden lg:col-span-4 lg:block">
                 <div class="sticky top-28 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                     <h2 class="text-lg font-bold">Keranjang</h2>
@@ -269,7 +243,12 @@
                             </div>
                             <input type="hidden" name="type" :value="type">
 
-                            <input x-show="type === 'dine_in' && paymentMethod !== 'cash'" type="number" name="table_number" min="1" max="200" inputmode="numeric" placeholder="Nomor Meja (1–200)" :required="type === 'dine_in' && paymentMethod !== 'cash'"
+                            <input type="text" name="customer_name" required pattern="(?=.*[A-Za-z])[A-Za-z\s]+" title="Nama hanya boleh berisi huruf dan spasi"
+                                   oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')"
+                                   placeholder="Nama Pemesan"
+                                   class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs focus:border-[#E4572E] focus:outline-none">
+
+                            <input x-show="type === 'dine_in'" type="number" name="table_number" min="1" max="200" inputmode="numeric" placeholder="Nomor Meja" :required="type === 'dine_in'"
                                    class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs focus:border-[#E4572E] focus:outline-none">
 
                             <select name="payment_method" x-model="paymentMethod" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs">
@@ -284,7 +263,6 @@
                     </div>
                 </div>
             </aside>
-            @endauth
         </main>
 
         {{-- Mobile Bottom Cart Bar --}}
@@ -368,7 +346,12 @@
                         </div>
                         <input type="hidden" name="type" :value="type">
 
-                        <input x-show="type === 'dine_in' && paymentMethod !== 'cash'" type="number" name="table_number" min="1" max="200" inputmode="numeric" placeholder="Nomor Meja (1–200)" :required="type === 'dine_in' && paymentMethod !== 'cash'"
+                        <input type="text" name="customer_name" required pattern="(?=.*[A-Za-z])[A-Za-z\s]+" title="Nama hanya boleh berisi huruf dan spasi"
+                               oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')"
+                               placeholder="Nama Pemesan"
+                               class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs focus:border-[#E4572E] focus:outline-none">
+
+                        <input x-show="type === 'dine_in'" type="number" name="table_number" min="1" max="200" inputmode="numeric" placeholder="Nomor Meja" :required="type === 'dine_in'"
                                class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs focus:border-[#E4572E] focus:outline-none">
 
                         <select name="payment_method" x-model="paymentMethod" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs">
@@ -448,35 +431,37 @@
             </div>
         </div>
         {{-- Customer Slide-over Sidebar --}}
-        @auth
-            <div x-show="drawerOpen" x-cloak class="fixed inset-0 z-50 flex justify-end bg-slate-900/50">
-                <div @click.outside="drawerOpen = false" class="flex h-full w-64 flex-col justify-between bg-[#1E2A47] p-5 text-white shadow-xl">
-                    <div>
-                        <div class="flex items-center justify-between">
-                            <span class="flex items-center gap-2 text-xl font-extrabold">
-                                <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-[#E4572E] text-white">
-                                    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6c-4.418 0-8 3.134-8 7h16c0-3.866-3.582-7-8-7zm0-2v2m-9 9h18m-2 0a2 2 0 01-2 2H7a2 2 0 01-2-2" />
-                                    </svg>
-                                </span>
-                                <span>Pesan<span class="text-[#E4572E]">Aja</span></span>
+        <div x-show="drawerOpen" x-cloak class="fixed inset-0 z-50 flex justify-end bg-slate-900/50">
+            <div @click.outside="drawerOpen = false" class="flex h-full w-64 flex-col justify-between bg-[#1E2A47] p-5 text-white shadow-xl">
+                <div>
+                    <div class="flex items-center justify-between">
+                        <span class="flex items-center gap-2 text-xl font-extrabold">
+                            <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-[#E4572E] text-white">
+                                <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6c-4.418 0-8 3.134-8 7h16c0-3.866-3.582-7-8-7zm0-2v2m-9 9h18m-2 0a2 2 0 01-2 2H7a2 2 0 01-2-2" />
+                                </svg>
                             </span>
-                            <button type="button" @click="drawerOpen = false" class="text-slate-300 hover:text-white">✕</button>
-                        </div>
-                        <nav class="mt-8 space-y-1 text-sm">
-                            <a href="{{ route('customer.menu') }}" class="block rounded-xl bg-white/10 px-3.5 py-2.5 font-semibold">Menu</a>
-                            <a href="{{ route('customer.orders') }}" class="block rounded-xl px-3.5 py-2.5 text-slate-300 hover:bg-white/5">Riwayat Transaksi</a>
-                            <a href="{{ route('profile.edit') }}" class="block rounded-xl px-3.5 py-2.5 text-slate-300 hover:bg-white/5">Profile</a>
-                        </nav>
+                            <span>Pesan<span class="text-[#E4572E]">Aja</span></span>
+                        </span>
+                        <button type="button" @click="drawerOpen = false" class="text-slate-300 hover:text-white">✕</button>
                     </div>
+                    <nav class="mt-8 space-y-1 text-sm">
+                        <a href="{{ route('customer.menu') }}" class="block rounded-xl bg-white/10 px-3.5 py-2.5 font-semibold">Menu</a>
+                        <a href="{{ route('customer.orders') }}" class="block rounded-xl px-3.5 py-2.5 text-slate-300 hover:bg-white/5">Riwayat Transaksi</a>
+                        @auth
+                            <a href="{{ route('profile.edit') }}" class="block rounded-xl px-3.5 py-2.5 text-slate-300 hover:bg-white/5">Profile</a>
+                        @endauth
+                    </nav>
+                </div>
+                @auth
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" style="background-color: #dc2626; color: #ffffff;" class="w-full rounded-xl px-3.5 py-2.5 text-left text-sm font-semibold hover:opacity-90">
                             Logout
                         </button>
                     </form>
-                </div>
+                @endauth
             </div>
-        @endauth
+        </div>
     </div>
 </x-app-layout>

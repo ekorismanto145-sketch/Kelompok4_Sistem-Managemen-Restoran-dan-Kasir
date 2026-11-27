@@ -23,8 +23,6 @@ Route::get('/', [MenuController::class, 'index'])->name('home');
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
-    Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-    Route::post('/register', [AuthController::class, 'register']);
     Route::get('/forgot-password', [PasswordResetController::class, 'showForgot'])->name('password.request');
     Route::post('/forgot-password', [PasswordResetController::class, 'sendOtp'])->name('password.email');
     Route::get('/verify-otp', [PasswordResetController::class, 'showOtpForm'])->name('password.otp.form');
@@ -45,21 +43,20 @@ Route::prefix('menu')->name('customer.')->group(function () {
     Route::get('/', [MenuController::class, 'index'])->name('menu');
 });
 
-Route::middleware(['auth', 'role:customer'])->group(function () {
-    Route::post('/checkout', [CheckoutController::class, 'store'])->name('customer.checkout');
-    Route::get('/payment/{order}', [MockPaymentController::class, 'show'])->name('customer.payment.show');
-    Route::post('/payment/{order}/simulate', [MockPaymentController::class, 'simulate'])->name('customer.payment.simulate');
-    Route::get('/orders', [OrderController::class, 'index'])->name('customer.orders');
-    Route::get('/orders/{order}', [OrderController::class, 'show'])->name('customer.orders.show');
-    Route::get('/orders/{order}/status', [OrderController::class, 'status'])->name('customer.orders.status');
-    Route::delete('/orders/{order}', [OrderController::class, 'destroy'])->name('customer.orders.destroy');
-});
+Route::post('/checkout', [CheckoutController::class, 'store'])->name('customer.checkout');
+Route::get('/payment/{order}', [MockPaymentController::class, 'show'])->name('customer.payment.show');
+Route::post('/payment/{order}/simulate', [MockPaymentController::class, 'simulate'])->name('customer.payment.simulate');
+Route::get('/orders', [OrderController::class, 'index'])->name('customer.orders');
+Route::get('/orders/{order}', [OrderController::class, 'show'])->name('customer.orders.show');
+Route::get('/orders/{order}/status', [OrderController::class, 'status'])->name('customer.orders.status');
+Route::delete('/orders/{order}', [OrderController::class, 'destroy'])->name('customer.orders.destroy');
 
 Route::middleware(['auth', 'role:kasir'])->prefix('kasir')->name('kasir.')->group(function () {
     Route::get('/', [QueueController::class, 'index'])->name('queue');
     Route::get('/pos', [PosController::class, 'index'])->name('pos');
     Route::post('/pos', [PosController::class, 'store'])->name('pos.store');
     Route::get('/history', [PosController::class, 'history'])->name('history');
+    Route::get('/orders/{order}/receipt', [PosController::class, 'receipt'])->name('receipt');
     Route::patch('/orders/{order}/status', [QueueController::class, 'updateStatus'])->name('orders.status');
     Route::post('/orders/{order}/cash', [KasirPaymentController::class, 'cash'])->name('orders.cash');
 });

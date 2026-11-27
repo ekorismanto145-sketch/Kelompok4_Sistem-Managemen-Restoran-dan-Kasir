@@ -40,6 +40,22 @@
                     </span>
                 </div>
 
+                @if ($lowStockMenus->isNotEmpty())
+                    <div class="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-900">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <div>
+                                <p class="text-sm font-bold">Notifikasi Stok Menipis (&lt; 50)</p>
+                                <p class="mt-0.5 text-xs">
+                                    {{ $lowStockMenus->map(fn ($m) => "{$m->name} ({$m->stock})")->implode(', ') }}
+                                </p>
+                            </div>
+                            <a href="{{ route('manajer.menus.index') }}" class="rounded-xl bg-amber-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-amber-700">
+                                Perbarui Stok
+                            </a>
+                        </div>
+                    </div>
+                @endif
+
                 <div class="mt-5 grid grid-cols-1 gap-4 md:grid-cols-3">
                     <div style="background-color: #fff5f2;" class="rounded-2xl border border-orange-100 p-5">
                         <p class="text-xs font-semibold text-slate-500">Omzet</p>

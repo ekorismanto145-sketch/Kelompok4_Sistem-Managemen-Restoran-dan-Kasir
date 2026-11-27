@@ -17,13 +17,14 @@ class OrderService
      * @param  array<int, array{menu_id:int, quantity:int, spicy_level?:int|null, note?:string|null}>  $items
      */
     public function checkout(
-        User $user,
+        ?User $user,
         array $items,
         string $type,
         ?string $tableNumber,
-        string $paymentMethod
+        string $paymentMethod,
+        ?string $customerName = null
     ): Order {
-        return DB::transaction(function () use ($user, $items, $type, $tableNumber, $paymentMethod): Order {
+        return DB::transaction(function () use ($user, $items, $type, $tableNumber, $paymentMethod, $customerName): Order {
             $menuIds = collect($items)->pluck('menu_id')->unique()->all();
             $menus = Menu::whereIn('id', $menuIds)->where('is_available', true)->get()->keyBy('id');
 
@@ -35,6 +36,8 @@ class OrderService
                 abort_unless($menu !== null, 422, 'Menu tidak tersedia.');
 
                 $qty = max(1, (int) $item['quantity']);
+                abort_unless($menu->stock >= $qty, 422, "Stok {$menu->name} tidak mencukupi.");
+                $menu->decrement('stock', $qty);
                 $spicyLevel = $menu->has_spicy_level ? (int) ($item['spicy_level'] ?? 0) : null;
                 $temperature = $menu->has_temperature_option
                     ? (in_array($item['temperature'] ?? null, ['hot', 'ice'], true) ? $item['temperature'] : 'ice')
@@ -63,7 +66,8 @@ class OrderService
 
             $order = Order::create([
                 'code' => 'ORD-'.strtoupper(Str::random(6)),
-                'user_id' => $user->id,
+                'user_id' => $user?->id,
+                'customer_name' => $customerName ?? $user?->name ?? 'Pelanggan',
                 'type' => $type,
                 'table_number' => $type === 'dine_in' ? $tableNumber : null,
                 'status' => OrderStatus::MenungguBayar,

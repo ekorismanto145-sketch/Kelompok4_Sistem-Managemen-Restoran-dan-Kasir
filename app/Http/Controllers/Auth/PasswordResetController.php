@@ -24,6 +24,11 @@ class PasswordResetController extends Controller
             'email.exists' => 'Email tidak terdaftar.',
         ]);
 
+        $user = User::where('email', $data['email'])->first();
+        if (! $user || ! in_array($user->role, [\App\Enums\Role::Kasir, \App\Enums\Role::Manajer], true)) {
+            return back()->withErrors(['email' => 'Fitur lupa password hanya tersedia untuk akun Kasir dan Manajer.'])->onlyInput('email');
+        }
+
         $otp = (string) random_int(100000, 999999);
 
         $request->session()->put([

@@ -59,3 +59,13 @@ php artisan migrate:fresh --seed
 php artisan storage:link
 php artisan serve
 ```
+
+---
+
+## 5. Pembaruan & Perbaikan Terbaru
+- **Customer Tanpa Login:** Rute `/register` dihapus; customer langsung diarahkan ke `/menu` dan dapat langsung memesan serta melihat riwayat pesanan berbasis *session* (`guest_order_ids`).
+- **Validasi Checkout Customer:** Menambahkan input **Nama Pemesan** (wajib huruf & spasi, tidak boleh spasi saja) dan **Nomor Meja** (wajib hanya untuk *Dine-in*). Keranjang desktop diposisikan di sebelah kanan menu (`lg:col-span-8` & `lg:col-span-4`).
+- **Stok Menu & Status Habis:** Menambahkan kolom `stock` pada tabel `menus` (otomatis berkurang saat checkout) dan `customer_name` pada tabel `orders`. Menu dengan `stock <= 0` otomatis berlabel **HABIS** di tampilan customer.
+- **Manajer (Stok & Validasi CRUD):** Menampilkan badge stok di setiap kartu menu (**Hijau** `> 100`, **Kuning** `50–100`, **Merah** `< 50`), notifikasi **Stok Menipis (< 50)** di Dashboard Manajer, serta validasi angka (`min:0`) untuk harga dan stok beserta label di form edit menu.
+- **Kasir (POS Take-Away, QRIS, Struk, & Mobile Sidebar):** POS Kasir khusus *Take-away* dengan input **Nama Pembeli**, pilihan pembayaran **Tunai** dan **QRIS** (lengkap dengan barcode QRIS), halaman **Cetak Struk** (`/kasir/orders/{order}/receipt`), tampilan nama pembeli di Antrian & Histori, serta **sidebar mobile (☰)** pada semua halaman Kasir.
+- **Lupa Password:** Dibatasi khusus untuk akun dengan role **Kasir** dan **Manajer**.

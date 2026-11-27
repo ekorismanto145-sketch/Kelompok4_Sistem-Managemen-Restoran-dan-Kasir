@@ -27,10 +27,16 @@ class MenuController extends Controller
             'name' => ['required', 'string', 'max:150'],
             'description' => ['nullable', 'string', 'max:500'],
             'price' => ['required', 'integer', 'min:0'],
+            'stock' => ['required', 'integer', 'min:0'],
             'image' => ['nullable', 'image', 'max:2048'],
             'is_available' => ['boolean'],
             'has_spicy_level' => ['boolean'],
             'has_temperature_option' => ['boolean'],
+        ], [
+            'price.integer' => 'Harga harus berupa angka.',
+            'price.min' => 'Harga tidak boleh minus.',
+            'stock.integer' => 'Stok harus berupa angka.',
+            'stock.min' => 'Stok tidak boleh minus.',
         ]);
 
         if ($request->hasFile('image')) {
@@ -55,10 +61,16 @@ class MenuController extends Controller
             'name' => ['required', 'string', 'max:150'],
             'description' => ['nullable', 'string', 'max:500'],
             'price' => ['required', 'integer', 'min:0'],
+            'stock' => ['required', 'integer', 'min:0'],
             'image' => ['nullable', 'image', 'max:2048'],
             'is_available' => ['boolean'],
             'has_spicy_level' => ['boolean'],
             'has_temperature_option' => ['boolean'],
+        ], [
+            'price.integer' => 'Harga harus berupa angka.',
+            'price.min' => 'Harga tidak boleh minus.',
+            'stock.integer' => 'Stok harus berupa angka.',
+            'stock.min' => 'Stok tidak boleh minus.',
         ]);
 
         if ($request->hasFile('image')) {

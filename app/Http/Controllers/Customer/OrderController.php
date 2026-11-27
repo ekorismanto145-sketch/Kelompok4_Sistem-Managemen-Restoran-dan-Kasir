@@ -12,18 +12,33 @@ class OrderController extends Controller
 {
     public function index(Request $request): View
     {
-        $orders = $request->user()
-            ->orders()
-            ->with('items')
-            ->latest()
-            ->get();
+        if ($request->user()) {
+            $orders = $request->user()
+                ->orders()
+                ->with('items')
+                ->latest()
+                ->get();
+        } else {
+            $guestOrderIds = $request->session()->get('guest_order_ids', []);
+            $orders = Order::whereIn('id', $guestOrderIds)
+                ->with('items')
+                ->latest()
+                ->get();
+        }
 
         return view('customer.orders', compact('orders'));
     }
 
+    private function authorizeOrderAccess(Request $request, Order $order): void
+    {
+        $isOwner = $request->user() && $order->user_id === $request->user()->id;
+        $isGuestOwner = in_array($order->id, $request->session()->get('guest_order_ids', []), true);
+        abort_unless($isOwner || $isGuestOwner, 403);
+    }
+
     public function show(Request $request, Order $order): View
     {
-        abort_unless($order->user_id === $request->user()->id, 403);
+        $this->authorizeOrderAccess($request, $order);
 
         $order->load('items', 'payment');
 
@@ -32,7 +47,7 @@ class OrderController extends Controller
 
     public function status(Request $request, Order $order): JsonResponse
     {
-        abort_unless($order->user_id === $request->user()->id, 403);
+        $this->authorizeOrderAccess($request, $order);
 
         return response()->json([
             'status' => $order->status->value,
@@ -43,7 +58,7 @@ class OrderController extends Controller
 
     public function destroy(Request $request, Order $order): \Illuminate\Http\RedirectResponse
     {
-        abort_unless($order->user_id === $request->user()->id, 403);
+        $this->authorizeOrderAccess($request, $order);
         abort_unless($order->status === \App\Enums\OrderStatus::Selesai, 422, 'Hanya pesanan yang sudah selesai yang dapat dihapus.');
 
         $order->delete();

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Manajer;
 
 use App\Enums\OrderStatus;
 use App\Http\Controllers\Controller;
+use App\Models\Menu;
 use App\Models\Order;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -44,6 +45,8 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        return view('manajer.dashboard', compact('omzetToday', 'ordersToday', 'avgOrder', 'hourlyOrders', 'topMenus'));
+        $lowStockMenus = Menu::where('stock', '<', 50)->orderBy('stock')->get();
+
+        return view('manajer.dashboard', compact('omzetToday', 'ordersToday', 'avgOrder', 'hourlyOrders', 'topMenus', 'lowStockMenus'));
     }
 }

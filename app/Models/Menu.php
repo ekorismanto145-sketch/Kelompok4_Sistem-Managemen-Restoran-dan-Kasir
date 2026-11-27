@@ -13,6 +13,7 @@ class Menu extends Model
         'name',
         'description',
         'price',
+        'stock',
         'image_url',
         'is_available',
         'has_spicy_level',
@@ -23,6 +24,7 @@ class Menu extends Model
     {
         return [
             'price' => 'integer',
+            'stock' => 'integer',
             'is_available' => 'boolean',
             'has_spicy_level' => 'boolean',
             'has_temperature_option' => 'boolean',

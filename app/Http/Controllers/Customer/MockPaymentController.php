@@ -14,7 +14,9 @@ class MockPaymentController extends Controller
 {
     public function show(Request $request, Order $order, PaymentService $paymentService): View
     {
-        abort_unless($order->user_id === $request->user()->id, 403);
+        $isOwner = $request->user() && $order->user_id === $request->user()->id;
+        $isGuestOwner = in_array($order->id, $request->session()->get('guest_order_ids', []), true);
+        abort_unless($isOwner || $isGuestOwner, 403);
 
         $payment = $order->payment ?? $paymentService->initMockPayment($order);
         $channels = PaymentService::CHANNELS;
@@ -28,7 +30,9 @@ class MockPaymentController extends Controller
         PaymentService $paymentService,
         OrderService $orderService
     ): RedirectResponse {
-        abort_unless($order->user_id === $request->user()->id, 403);
+        $isOwner = $request->user() && $order->user_id === $request->user()->id;
+        $isGuestOwner = in_array($order->id, $request->session()->get('guest_order_ids', []), true);
+        abort_unless($isOwner || $isGuestOwner, 403);
 
         $data = $request->validate([
             'channel' => ['required', 'in:'.implode(',', array_keys(PaymentService::CHANNELS))],

@@ -1,5 +1,5 @@
 <x-app-layout title="Histori Transaksi Kasir · PesanAja">
-    <div class="min-h-screen md:flex">
+    <div x-data="{ drawerOpen: false }" class="min-h-screen md:flex">
         <aside class="hidden w-60 shrink-0 bg-[#1E2A47] p-5 text-white md:block">
             <div class="text-xl font-extrabold">Pesan<span class="text-[#E4572E]">Aja</span></div>
             <nav class="mt-8 space-y-1 text-sm">
@@ -12,6 +12,8 @@
                 </form>
             </nav>
         </aside>
+
+        @include('kasir.partials.mobile-sidebar')
 
         <main class="flex-1 min-w-0 p-4 md:p-8">
             <div class="mx-auto max-w-5xl">
@@ -37,6 +39,8 @@
                                     <p class="text-xs text-slate-500">{{ $order->created_at->format('d M Y, H:i') }} · {{ strtoupper($order->payment_method) }} · {{ $order->items->sum('quantity') }} item</p>
                                 </div>
                                 <div class="flex items-center gap-3">
+                                    <span class="text-xs font-semibold text-slate-700">{{ $order->customer_name ?? $order->user?->name ?? 'Pelanggan' }}</span>
+                                    <span class="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold uppercase text-slate-600">{{ $order->payment_method }}</span>
                                     <x-price :amount="$order->total" class="font-bold text-[#1E2A47]" />
                                     <x-status-badge :status="$order->status" />
                                 </div>
@@ -56,6 +60,9 @@
                                 <div class="flex justify-between font-bold text-[#1E2A47]">
                                     <span>Total Pembayaran</span>
                                     <x-price :amount="$order->total" />
+                                </div>
+                                <div class="pt-2 text-right">
+                                    <a href="{{ route('kasir.receipt', $order) }}" class="inline-block rounded-lg bg-[#1E2A47] px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90">Cetak Struk</a>
                                 </div>
                             </div>
                         </div>

@@ -1,5 +1,5 @@
 <x-app-layout title="Antrian Kasir · PesanAja">
-    <div x-data="{ tab: 'menunggu' }" class="min-h-screen bg-slate-50 md:flex">
+    <div x-data="{ tab: 'menunggu', drawerOpen: false }" class="min-h-screen bg-slate-50 md:flex">
         <aside class="hidden w-60 shrink-0 bg-[#1E2A47] p-5 text-white md:block">
             <div class="text-xl font-extrabold">Pesan<span class="text-[#E4572E]">Aja</span></div>
             <nav class="mt-8 space-y-1 text-sm">
@@ -12,6 +12,8 @@
                 </form>
             </nav>
         </aside>
+
+        @include('kasir.partials.mobile-sidebar')
 
         <div class="flex-1 min-w-0">
         <header class="border-b border-slate-200 bg-white">
@@ -59,7 +61,7 @@
                                 <span>{{ $order->code }}</span>
                                 <x-price :amount="$order->total" />
                             </div>
-                            <p class="mt-1 text-xs text-slate-500">{{ $order->user->name }} · {{ $order->type === 'dine_in' ? 'Meja '.$order->table_number : 'Take-away' }}</p>
+                            <p class="mt-1 text-xs text-slate-500">{{ $order->customer_name ?? $order->user?->name ?? 'Pelanggan' }} · {{ $order->type === 'dine_in' ? 'Meja '.$order->table_number : 'Take-away' }}</p>
                             <form method="POST" action="{{ route('kasir.orders.cash', $order) }}" class="mt-3">
                                 @csrf
                                 <button type="submit" class="w-full rounded-xl bg-[#F2A541] py-2.5 text-xs font-bold text-white hover:opacity-90">
@@ -86,6 +88,7 @@
                                 <span>{{ $order->queue_number ?? $order->code }}</span>
                                 <span class="text-xs text-slate-500">{{ $order->type === 'dine_in' ? 'Meja '.$order->table_number : 'Take-away' }}</span>
                             </div>
+                            <p class="mt-0.5 text-xs font-semibold text-slate-700">{{ $order->customer_name ?? $order->user?->name ?? 'Pelanggan' }}</p>
                             <ul class="mt-2 space-y-0.5 text-xs text-slate-600">
                                 @foreach ($order->items as $item)
                                     <li>{{ $item->quantity }}x {{ $item->menu_name }} @if(!is_null($item->spicy_level)) Lv{{ $item->spicy_level }} @endif @if($item->temperature) ({{ ucfirst($item->temperature) }}) @endif</li>
@@ -119,6 +122,7 @@
                                 <span>{{ $order->queue_number ?? $order->code }}</span>
                                 <span class="text-xs text-slate-500">{{ $order->type === 'dine_in' ? 'Meja '.$order->table_number : 'Take-away' }}</span>
                             </div>
+                            <p class="mt-0.5 text-xs font-semibold text-slate-700">{{ $order->customer_name ?? $order->user?->name ?? 'Pelanggan' }}</p>
                             <form method="POST" action="{{ route('kasir.orders.status', $order) }}" class="mt-3">
                                 @csrf
                                 @method('PATCH')

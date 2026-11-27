@@ -1,5 +1,6 @@
 <x-app-layout title="Buat Pesanan Kasir · PesanAja">
     <div x-data="{
+        drawerOpen: false,
         search: '',
         cart: [],
         sheetOpen: false,
@@ -55,6 +56,8 @@
                 </form>
             </nav>
         </aside>
+
+        @include('kasir.partials.mobile-sidebar')
 
         <main class="flex-1 min-w-0 p-4 md:p-6 lg:grid lg:grid-cols-12 lg:gap-6">
             <section class="lg:col-span-8">
@@ -119,8 +122,9 @@
                             <span>Total Pembayaran</span>
                             <span class="text-[#E4572E]" x-text="formatRp(totalPrice + Math.round(totalPrice * 0.10))"></span>
                         </div>
-                        <form method="POST" action="{{ route('kasir.pos.store') }}" class="space-y-2.5">
+                        <form method="POST" action="{{ route('kasir.pos.store') }}" class="space-y-2.5" x-data="{ paymentMethod: 'cash' }">
                             @csrf
+                            <input type="hidden" name="type" value="take_away">
                             <template x-for="(item, idx) in cart" :key="idx">
                                 <div>
                                     <input type="hidden" :name="`items[${idx}][menu_id]`" :value="item.id">
@@ -130,12 +134,50 @@
                                     <input type="hidden" :name="`items[${idx}][note]`" :value="item.note">
                                 </div>
                             </template>
-                            <select name="type" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs">
-                                <option value="dine_in">Dine-in</option>
-                                <option value="take_away">Take-away</option>
+                            <input type="text" name="customer_name" required pattern="[A-Za-z\s]+" title="Nama hanya boleh berisi huruf dan spasi"
+                                   oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')"
+                                   placeholder="Nama Pembeli"
+                                   class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs focus:border-[#E4572E] focus:outline-none">
+                            <select name="payment_method" x-model="paymentMethod" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs">
+                                <option value="cash">Tunai (Cash)</option>
+                                <option value="qris">QRIS</option>
                             </select>
+                            <div x-show="paymentMethod === 'qris'" x-cloak class="rounded-xl border border-teal-200 bg-teal-50 p-3 text-center text-xs text-teal-800">
+                                <p class="font-bold">Scan QRIS</p>
+                                <div class="my-1.5 flex justify-center">
+                                    <svg style="width: 56px; height: 56px;" class="rounded-lg bg-white p-1 shadow-sm" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <rect width="100" height="100" fill="white"/>
+                                        <rect x="8" y="8" width="26" height="26" stroke="#1E2A47" stroke-width="4"/>
+                                        <rect x="15" y="15" width="12" height="12" fill="#1E2A47"/>
+                                        <rect x="66" y="8" width="26" height="26" stroke="#1E2A47" stroke-width="4"/>
+                                        <rect x="73" y="15" width="12" height="12" fill="#1E2A47"/>
+                                        <rect x="8" y="66" width="26" height="26" stroke="#1E2A47" stroke-width="4"/>
+                                        <rect x="15" y="73" width="12" height="12" fill="#1E2A47"/>
+                                        <rect x="42" y="10" width="6" height="6" fill="#1E2A47"/>
+                                        <rect x="52" y="10" width="6" height="6" fill="#1E2A47"/>
+                                        <rect x="42" y="22" width="16" height="6" fill="#1E2A47"/>
+                                        <rect x="10" y="42" width="12" height="6" fill="#1E2A47"/>
+                                        <rect x="28" y="42" width="10" height="6" fill="#1E2A47"/>
+                                        <rect x="44" y="42" width="12" height="12" fill="#E4572E"/>
+                                        <rect x="62" y="42" width="10" height="6" fill="#1E2A47"/>
+                                        <rect x="78" y="42" width="14" height="6" fill="#1E2A47"/>
+                                        <rect x="10" y="54" width="6" height="6" fill="#1E2A47"/>
+                                        <rect x="22" y="54" width="16" height="6" fill="#1E2A47"/>
+                                        <rect x="62" y="54" width="16" height="6" fill="#1E2A47"/>
+                                        <rect x="84" y="54" width="8" height="6" fill="#1E2A47"/>
+                                        <rect x="42" y="66" width="8" height="12" fill="#1E2A47"/>
+                                        <rect x="56" y="66" width="14" height="6" fill="#1E2A47"/>
+                                        <rect x="76" y="66" width="16" height="6" fill="#1E2A47"/>
+                                        <rect x="56" y="78" width="6" height="14" fill="#1E2A47"/>
+                                        <rect x="68" y="78" width="12" height="6" fill="#1E2A47"/>
+                                        <rect x="86" y="78" width="6" height="14" fill="#1E2A47"/>
+                                        <rect x="42" y="84" width="8" height="8" fill="#1E2A47"/>
+                                        <rect x="68" y="88" width="12" height="4" fill="#1E2A47"/>
+                                    </svg>
+                                </div>
+                            </div>
                             <button type="submit" class="w-full rounded-xl bg-[#2A9D8F] py-3 text-sm font-bold text-white hover:opacity-90">
-                                Proses & Bayar Tunai
+                                Proses &amp; Cetak Struk
                             </button>
                         </form>
                     </div>
