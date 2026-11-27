@@ -26,8 +26,12 @@ class DashboardController extends Controller
         $ordersToday = (clone $paidToday)->count();
         $avgOrder = $ordersToday > 0 ? (int) round($omzetToday / $ordersToday) : 0;
 
+        $hourExpr = DB::getDriverName() === 'pgsql'
+            ? 'EXTRACT(HOUR FROM created_at)'
+            : 'HOUR(created_at)';
+
         $hourlyRaw = (clone $paidToday)
-            ->select(DB::raw('HOUR(created_at) as hour'), DB::raw('COUNT(*) as total'))
+            ->select(DB::raw("{$hourExpr} as hour"), DB::raw('COUNT(*) as total'))
             ->groupBy('hour')
             ->pluck('total', 'hour');
 

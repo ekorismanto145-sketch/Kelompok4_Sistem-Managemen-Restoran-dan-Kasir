@@ -69,3 +69,13 @@ php artisan serve
 - **Manajer (Stok & Validasi CRUD):** Menampilkan badge stok di setiap kartu menu (**Hijau** `> 100`, **Kuning** `50–100`, **Merah** `< 50`), notifikasi **Stok Menipis (< 50)** di Dashboard Manajer, serta validasi angka (`min:0`) untuk harga dan stok beserta label di form edit menu.
 - **Kasir (POS Take-Away, QRIS, Struk, & Mobile Sidebar):** POS Kasir khusus *Take-away* dengan input **Nama Pembeli**, pilihan pembayaran **Tunai** dan **QRIS** (lengkap dengan barcode QRIS), halaman **Cetak Struk** (`/kasir/orders/{order}/receipt`), tampilan nama pembeli di Antrian & Histori, serta **sidebar mobile (☰)** pada semua halaman Kasir.
 - **Lupa Password:** Dibatasi khusus untuk akun dengan role **Kasir** dan **Manajer**.
+
+---
+
+## 6. Kesiapan Materi PBWL & Deployment (Vercel + Supabase)
+- **Sudah Diterapkan:** Routing & Blade Templating, Controller & Validasi Request, Migration & Eloquent ORM (`belongsTo`, `hasMany`, `hasOne`, `DB::transaction()`), Authentication & Middleware Role (`EnsureRole`), CRUD & File Upload, Session, Flash Message, dan Pagination.
+- **Sudah Diterapkan untuk Deployment (Vercel + Supabase):**
+  1. File `vercel.json` (`vercel-php@0.7.3`, `buildCommand: npm run build`, `outputDirectory: public`) dan entry point serverless `api/index.php`.
+  2. Penyesuaian query `DashboardController` agar mendukung PostgreSQL (`EXTRACT(HOUR FROM created_at)`) dan MySQL (`HOUR(created_at)`).
+  3. Force HTTPS di `AppServiceProvider` saat `APP_ENV=production`.
+  4. Konfigurasi environment production (`DB_CONNECTION=pgsql`, `DB_PORT=6543`, `APP_ENV=production`, `APP_DEBUG=false`, `SESSION_DRIVER=cookie`) disiapkan di Vercel Environment Variables.
