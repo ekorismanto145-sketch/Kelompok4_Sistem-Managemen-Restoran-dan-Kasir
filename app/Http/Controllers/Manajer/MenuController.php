@@ -39,9 +39,8 @@ class MenuController extends Controller
             'stock.min' => 'Stok tidak boleh minus.',
         ]);
 
-        if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('menus', 'public');
-            $data['image_url'] = asset('storage/'.$path);
+        if ($imageUrl = $this->storeImageUrl($request)) {
+            $data['image_url'] = $imageUrl;
         }
         unset($data['image']);
 
@@ -73,9 +72,8 @@ class MenuController extends Controller
             'stock.min' => 'Stok tidak boleh minus.',
         ]);
 
-        if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('menus', 'public');
-            $data['image_url'] = asset('storage/'.$path);
+        if ($imageUrl = $this->storeImageUrl($request)) {
+            $data['image_url'] = $imageUrl;
         }
         unset($data['image']);
 
@@ -93,5 +91,24 @@ class MenuController extends Controller
         $menu->delete();
 
         return back()->with('success', 'Menu berhasil dihapus.');
+    }
+
+    private function storeImageUrl(Request $request): ?string
+    {
+        if (! $request->hasFile('image')) {
+            return null;
+        }
+
+        $file = $request->file('image');
+
+        try {
+            $path = $file->store('menus', 'public');
+
+            return asset('storage/'.$path);
+        } catch (\Throwable) {
+            $mime = $file->getMimeType() ?: 'image/jpeg';
+
+            return 'data:'.$mime.';base64,'.base64_encode($file->get());
+        }
     }
 }
